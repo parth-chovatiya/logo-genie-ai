@@ -1,7 +1,7 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { logoGenerationRequestSchema } from "../shared/schema";
+import { logoGenerationRequestSchema } from "@shared/schema";
 import { generateLogos } from "./services/gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
