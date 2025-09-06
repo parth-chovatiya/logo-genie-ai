@@ -5,7 +5,6 @@ import { logoGenerationRequestSchema } from "@shared/schema";
 import { generateLogos } from "./services/gemini";
 
 export async function registerRoutes(app: Express): Promise<Server> {
-  
   app.post("/api/generate", async (req, res) => {
     try {
       // Validate request body
@@ -43,7 +42,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     } catch (error) {
       console.error("Logo generation error:", error);
       res.status(500).json({
-        message: error instanceof Error ? error.message : "Failed to generate logos. Please try again.",
+        message:
+          error instanceof Error
+            ? error.message
+            : "Failed to generate logos. Please try again.",
       });
     }
   });

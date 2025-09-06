@@ -4,17 +4,21 @@ import { createInsertSchema } from "drizzle-zod";
 import { z } from "zod";
 
 export const logoRequests = pgTable("logo_requests", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  id: varchar("id")
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   brandName: text("brand_name").notNull(),
   description: text("description").notNull(),
   businessType: text("business_type").notNull(),
   colorPreference: text("color_preference"),
-  generatedLogos: jsonb("generated_logos").$type<Array<{
-    id: string;
-    imageData: string;
-    style: string;
-    rating: number;
-  }>>(),
+  generatedLogos: jsonb("generated_logos").$type<
+    Array<{
+      id: string;
+      imageData: string;
+      style: string;
+      rating: number;
+    }>
+  >(),
   createdAt: timestamp("created_at").defaultNow(),
 });
 
