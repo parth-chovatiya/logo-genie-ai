@@ -1,5 +1,4 @@
 import { useState } from "react";
-import Header from "../components/header";
 import HeroForm from "../components/hero-form";
 import LoadingState from "../components/loading-state";
 import LogoGrid from "../components/logo-grid";
@@ -38,8 +37,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background">
-      <Header />
-      
       <main className="container mx-auto px-4 py-12">
         {!isLoading && !showResults && !error && (
           <HeroForm 
