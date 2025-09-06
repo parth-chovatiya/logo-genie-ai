@@ -62,25 +62,6 @@ export default function Home() {
           />
         )}
       </main>
-
-      <footer className="border-t border-border bg-card mt-24">
-        <div className="container mx-auto px-4 py-12">
-          <div className="flex flex-col items-center text-center space-y-6">
-            <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-br from-primary to-accent rounded-lg flex items-center justify-center">
-                <i className="fas fa-magic text-white text-sm"></i>
-              </div>
-              <h1 className="text-xl font-bold text-foreground">LogoAI</h1>
-            </div>
-            <p className="text-muted-foreground max-w-md">
-              Create professional logos with AI-powered design technology. Perfect for Figma, websites, and print.
-            </p>
-            <div className="border-t border-border w-full max-w-md pt-6">
-              <p className="text-muted-foreground">&copy; 2024 LogoAI. All rights reserved.</p>
-            </div>
-          </div>
-        </div>
-      </footer>
     </div>
   );
 }
