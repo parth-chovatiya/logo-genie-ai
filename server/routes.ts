@@ -4,7 +4,7 @@ import { storage } from "./storage";
 import { logoGenerationRequestSchema } from "../shared/schema";
 import { generateLogos } from "./services/gemini";
 
-export function mountRoutes(app: Express): void {
+export async function registerRoutes(app: Express): Promise<Server> {
   app.post("/api/generate", async (req, res) => {
     try {
       // Validate request body
@@ -65,12 +65,7 @@ export function mountRoutes(app: Express): void {
       res.status(500).json({ message: "Failed to fetch logo request" });
     }
   });
-}
 
-export async function registerRoutes(app: Express): Promise<Server> {
-  // mount API routes
-  mountRoutes(app);
-  // create a Node HTTP server (used in local dev server only)
   const httpServer = createServer(app);
   return httpServer;
 }

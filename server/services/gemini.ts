@@ -1,5 +1,7 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { randomUUID } from "crypto";
+import * as fs from "fs";
+import * as path from "path";
 import { GeneratedLogo } from "../../shared/schema";
 import dotenv from "dotenv";
 dotenv.config();
