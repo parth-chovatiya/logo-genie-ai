@@ -12,7 +12,7 @@ export default function LogoGrid({ logos, onGenerateMore }: LogoGridProps) {
     <div className="max-w-6xl mx-auto">
       <div className="text-center mb-16">
         <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full mb-6">
-          <i className="fas fa-sparkles text-white text-2xl"></i>
+          <i className="fas fa-check text-white text-2xl"></i>
         </div>
         <h3 className="text-4xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
           Your AI-Generated Logos
