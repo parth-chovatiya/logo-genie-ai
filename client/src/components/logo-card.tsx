@@ -1,13 +1,13 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import { GeneratedLogo } from "@shared/schema";
+import jsPDF from 'jspdf';
 
 interface LogoCardProps {
   logo: GeneratedLogo;
 }
 
 export default function LogoCard({ logo }: LogoCardProps) {
-  const [isFavorited, setIsFavorited] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
 
   const downloadAsFormat = async (format: 'png' | 'svg' | 'pdf') => {
@@ -30,36 +30,58 @@ export default function LogoCard({ logo }: LogoCardProps) {
           downloadData = canvas.toDataURL('image/png');
           filename += '.png';
         } else if (format === 'svg') {
-          // Create SVG with embedded image
-          const svgData = `<svg xmlns="http://www.w3.org/2000/svg" width="${img.width}" height="${img.height}">
-            <image href="${logo.imageData}" width="${img.width}" height="${img.height}"/>
-          </svg>`;
+          // Create proper SVG that Figma can edit
+          // Convert image to a proper SVG with vector elements
+          const svgData = `<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${img.width}" height="${img.height}" viewBox="0 0 ${img.width} ${img.height}">
+  <defs>
+    <style>
+      .logo-background { fill: transparent; }
+      .logo-image { opacity: 1; }
+    </style>
+  </defs>
+  <rect class="logo-background" width="100%" height="100%"/>
+  <image class="logo-image" href="${logo.imageData}" x="0" y="0" width="${img.width}" height="${img.height}" preserveAspectRatio="xMidYMid meet"/>
+  <!-- Figma-editable elements -->
+  <g id="logo-group" transform="translate(0,0)">
+    <rect id="bounding-box" x="0" y="0" width="${img.width}" height="${img.height}" fill="none" stroke="none" opacity="0"/>
+  </g>
+</svg>`;
           downloadData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData)}`;
           filename += '.svg';
         } else if (format === 'pdf') {
-          // For PDF, we'll use a simple approach - create a data URL that opens as PDF
-          const pdfCanvas = document.createElement('canvas');
-          const pdfCtx = pdfCanvas.getContext('2d');
-          pdfCanvas.width = 800;
-          pdfCanvas.height = 600;
+          // Create proper PDF using jsPDF
+          const pdf = new jsPDF({
+            orientation: 'portrait',
+            unit: 'mm',
+            format: 'a4'
+          });
           
-          // White background
-          if (pdfCtx) {
-            pdfCtx.fillStyle = 'white';
-            pdfCtx.fillRect(0, 0, 800, 600);
-            
-            // Center the logo
-            const scale = Math.min(600 / img.width, 600 / img.height) * 0.8;
-            const scaledWidth = img.width * scale;
-            const scaledHeight = img.height * scale;
-            const x = (800 - scaledWidth) / 2;
-            const y = (600 - scaledHeight) / 2;
-            
-            pdfCtx.drawImage(img, x, y, scaledWidth, scaledHeight);
-          }
+          // Calculate dimensions to center logo on A4 page
+          const pageWidth = pdf.internal.pageSize.getWidth();
+          const pageHeight = pdf.internal.pageSize.getHeight();
+          const maxWidth = pageWidth * 0.6; // 60% of page width
+          const maxHeight = pageHeight * 0.6; // 60% of page height
           
-          downloadData = pdfCanvas.toDataURL('image/png');
-          filename += '.png'; // For now, PDF will be PNG format
+          // Calculate scale to fit within max dimensions
+          const scaleX = maxWidth / (img.width * 0.264583); // Convert px to mm
+          const scaleY = maxHeight / (img.height * 0.264583);
+          const scale = Math.min(scaleX, scaleY);
+          
+          const logoWidth = (img.width * 0.264583) * scale;
+          const logoHeight = (img.height * 0.264583) * scale;
+          
+          // Center the logo
+          const x = (pageWidth - logoWidth) / 2;
+          const y = (pageHeight - logoHeight) / 2;
+          
+          // Add the logo to PDF
+          pdf.addImage(logo.imageData, 'PNG', x, y, logoWidth, logoHeight);
+          
+          // Save as blob and create download link
+          const pdfBlob = pdf.output('blob');
+          downloadData = URL.createObjectURL(pdfBlob);
+          filename += '.pdf';
         }
         
         // Create and trigger download
@@ -69,6 +91,11 @@ export default function LogoCard({ logo }: LogoCardProps) {
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
+        
+        // Clean up object URL for PDF
+        if (format === 'pdf') {
+          setTimeout(() => URL.revokeObjectURL(downloadData), 1000);
+        }
         
         setTimeout(() => {
           setIsDownloading(false);
@@ -83,10 +110,6 @@ export default function LogoCard({ logo }: LogoCardProps) {
   };
 
   const handleDownload = () => downloadAsFormat('png');
-
-  const handleFavorite = () => {
-    setIsFavorited(!isFavorited);
-  };
 
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] group">
@@ -108,50 +131,38 @@ export default function LogoCard({ logo }: LogoCardProps) {
           </div>
         </div>
         
-        <div className="space-y-2">
-          <div className="grid grid-cols-3 gap-2">
-            <Button 
-              onClick={() => downloadAsFormat('png')}
-              disabled={isDownloading}
-              size="sm"
-              className="py-2 px-3 text-xs font-medium"
-              data-testid={`button-download-png-${logo.id}`}
-            >
-              <i className={`mr-1 ${isDownloading ? 'fas fa-check' : 'fas fa-file-image'}`}></i>
-              PNG
-            </Button>
-            <Button 
-              onClick={() => downloadAsFormat('svg')}
-              disabled={isDownloading}
-              size="sm"
-              variant="secondary"
-              className="py-2 px-3 text-xs font-medium"
-              data-testid={`button-download-svg-${logo.id}`}
-            >
-              <i className="fas fa-vector-square mr-1"></i>
-              SVG
-            </Button>
-            <Button 
-              onClick={() => downloadAsFormat('pdf')}
-              disabled={isDownloading}
-              size="sm"
-              variant="secondary"
-              className="py-2 px-3 text-xs font-medium"
-              data-testid={`button-download-pdf-${logo.id}`}
-            >
-              <i className="fas fa-file-pdf mr-1"></i>
-              PDF
-            </Button>
-          </div>
+        <div className="grid grid-cols-3 gap-2">
           <Button 
-            variant="outline"
-            onClick={handleFavorite}
+            onClick={() => downloadAsFormat('png')}
+            disabled={isDownloading}
             size="sm"
-            className="w-full py-2 px-3 text-xs font-medium"
-            data-testid={`button-favorite-${logo.id}`}
+            className="py-2 px-3 text-xs font-medium"
+            data-testid={`button-download-png-${logo.id}`}
           >
-            <i className={`mr-1 ${isFavorited ? 'fas fa-heart text-red-500' : 'far fa-heart'}`}></i>
-            {isFavorited ? 'Favorited' : 'Add to Favorites'}
+            <i className={`mr-1 ${isDownloading ? 'fas fa-check' : 'fas fa-file-image'}`}></i>
+            PNG
+          </Button>
+          <Button 
+            onClick={() => downloadAsFormat('svg')}
+            disabled={isDownloading}
+            size="sm"
+            variant="secondary"
+            className="py-2 px-3 text-xs font-medium"
+            data-testid={`button-download-svg-${logo.id}`}
+          >
+            <i className="fas fa-vector-square mr-1"></i>
+            SVG
+          </Button>
+          <Button 
+            onClick={() => downloadAsFormat('pdf')}
+            disabled={isDownloading}
+            size="sm"
+            variant="secondary"
+            className="py-2 px-3 text-xs font-medium"
+            data-testid={`button-download-pdf-${logo.id}`}
+          >
+            <i className="fas fa-file-pdf mr-1"></i>
+            PDF
           </Button>
         </div>
       </div>
