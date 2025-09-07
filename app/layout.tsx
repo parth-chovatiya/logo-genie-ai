@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Providers from "./providers";
 import "./globals.css";
+import { MessageCircle } from "lucide-react";
 
 export const metadata: Metadata = {
   title: "LogoAI",
@@ -23,7 +24,7 @@ export default function RootLayout({
             rel="noopener noreferrer"
             className="fixed left-4 bottom-4 z-50 inline-flex items-center gap-2 rounded-md border border-border bg-card px-3 py-2 text-sm text-foreground shadow hover:bg-accent hover:text-accent-foreground transition-colors"
           >
-            <i className="fas fa-comment-dots" />
+            <MessageCircle className="h-4 w-4" />
             <span>Suggestions</span>
           </a>
         </Providers>

@@ -1,11 +1,12 @@
 import { Skeleton } from "@/components/ui/skeleton";
+import { Wand2 } from "lucide-react";
 
 export default function LoadingState() {
   return (
     <div className="max-w-6xl mx-auto py-12">
       <div className="max-w-2xl mx-auto text-center space-y-6">
         <div className="w-16 h-16 mx-auto bg-gradient-to-r from-primary to-accent rounded-full flex items-center justify-center animate-pulse-slow">
-          <i className="fas fa-magic text-white text-xl animate-spin"></i>
+          <Wand2 className="h-6 w-6 text-white animate-pulse" />
         </div>
         <h3 className="text-2xl font-semibold text-foreground">
           Creating Your Logos

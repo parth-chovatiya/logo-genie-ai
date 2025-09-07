@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { GeneratedLogo } from "@shared/schema";
 import jsPDF from "jspdf";
+import { FileImage, FileDigit, FileType, Star } from "lucide-react";
 
 interface LogoCardProps {
   logo: GeneratedLogo;
@@ -139,7 +140,7 @@ export default function LogoCard({ logo }: LogoCardProps) {
             Style: {logo.style}
           </span>
           <div className="flex items-center space-x-1">
-            <i className="fas fa-star text-yellow-400 text-sm"></i>
+            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
             <span className="text-sm text-muted-foreground">{logo.rating}</span>
           </div>
         </div>
@@ -152,11 +153,7 @@ export default function LogoCard({ logo }: LogoCardProps) {
             className="py-2 px-3 text-xs font-medium"
             data-testid={`button-download-png-${logo.id}`}
           >
-            <i
-              className={`mr-1 ${
-                isDownloading ? "fas fa-check" : "fas fa-file-image"
-              }`}
-            ></i>
+            <FileImage className="h-4 w-4 mr-1" />
             PNG
           </Button>
           <Button
@@ -167,7 +164,7 @@ export default function LogoCard({ logo }: LogoCardProps) {
             className="py-2 px-3 text-xs font-medium"
             data-testid={`button-download-svg-${logo.id}`}
           >
-            <i className="fas fa-vector-square mr-1"></i>
+            <FileType className="h-4 w-4 mr-1" />
             SVG
           </Button>
           <Button
@@ -178,7 +175,7 @@ export default function LogoCard({ logo }: LogoCardProps) {
             className="py-2 px-3 text-xs font-medium"
             data-testid={`button-download-pdf-${logo.id}`}
           >
-            <i className="fas fa-file-pdf mr-1"></i>
+            <FileDigit className="h-4 w-4 mr-1" />
             PDF
           </Button>
         </div>

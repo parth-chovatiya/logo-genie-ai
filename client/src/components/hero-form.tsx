@@ -26,6 +26,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { apiRequest } from "@/lib/queryClient";
+import { Wand2 } from "lucide-react";
 
 interface HeroFormProps {
   onGenerate: (logos: GeneratedLogo[]) => void;
@@ -200,7 +201,7 @@ export default function HeroForm({
             className="w-full bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground py-4 px-6 rounded-lg font-semibold text-lg transition-all duration-200 transform hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2"
             data-testid="button-generate"
           >
-            <i className="fas fa-magic mr-2"></i>
+            <Wand2 className="h-5 w-5 mr-1" />
             {isSubmitting ? "Generating..." : "Generate Logos"}
           </Button>
         </form>
