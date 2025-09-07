@@ -53,7 +53,7 @@ The logo should be centered on a square canvas with adequate padding around the 
 
     try {
       const response = await ai.models.generateContent({
-        model: "gemini-2.0-flash-preview-image-generation",
+        model: "gemini-2.5-flash-image-preview",
         contents: [{ role: "user", parts: [{ text: prompt }] }],
         config: {
           responseModalities: [Modality.TEXT, Modality.IMAGE],

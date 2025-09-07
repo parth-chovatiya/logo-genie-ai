@@ -39,7 +39,7 @@ export default function Home() {
     <div className="min-h-screen bg-background">
       <main className="container mx-auto px-4 py-12">
         {!isLoading && !showResults && !error && (
-          <HeroForm 
+          <HeroForm
             onGenerate={handleGenerateLogos}
             onLoading={setIsLoading}
             onError={handleError}
@@ -49,18 +49,13 @@ export default function Home() {
         {isLoading && <LoadingState />}
 
         {showResults && generatedLogos.length > 0 && (
-          <LogoGrid 
+          <LogoGrid
             logos={generatedLogos}
             onGenerateMore={handleGenerateMore}
           />
         )}
 
-        {error && (
-          <ErrorState 
-            message={error}
-            onRetry={handleRetry}
-          />
-        )}
+        {error && <ErrorState message={error} onRetry={handleRetry} />}
       </main>
     </div>
   );
