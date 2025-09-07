@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Providers from "./providers";
 import "./globals.css";
 import { MessageCircle } from "lucide-react";
+import { Analytics } from "@vercel/analytics/next";
 
 export const metadata: Metadata = {
   title: "LogoAI",
@@ -27,6 +28,7 @@ export default function RootLayout({
             <MessageCircle className="h-4 w-4" />
             <span>Suggestions</span>
           </a>
+          <Analytics />
         </Providers>
       </body>
     </html>
