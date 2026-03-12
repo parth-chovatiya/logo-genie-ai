@@ -4,9 +4,54 @@ import "./globals.css";
 import { MessageCircle } from "lucide-react";
 import { Analytics } from "@vercel/analytics/next";
 
+const siteUrl =
+  process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
+
 export const metadata: Metadata = {
-  title: "LogoAI",
-  description: "Generate logos with AI",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "LogoGenie AI",
+    template: "%s | LogoGenie AI",
+  },
+  description:
+    "Generate unique, high-quality logos in seconds with AI. Pick a style, tweak your brand details, and download instantly.",
+  applicationName: "LogoGenie AI",
+  keywords: [
+    "AI logo generator",
+    "logo generator",
+    "LogoGenie AI",
+    "brand identity",
+    "startup branding",
+    "logo design",
+  ],
+  alternates: {
+    canonical: "/",
+  },
+  openGraph: {
+    type: "website",
+    url: "/",
+    title: "LogoGenie AI",
+    description:
+      "Generate unique, high-quality logos in seconds with AI. Pick a style, tweak your brand details, and download instantly.",
+    siteName: "LogoGenie AI",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LogoGenie AI",
+    description:
+      "Generate unique, high-quality logos in seconds with AI. Pick a style, tweak your brand details, and download instantly.",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+      "max-video-preview": -1,
+    },
+  },
 };
 
 export default function RootLayout({

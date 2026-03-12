@@ -1,4 +1,4 @@
-## Logo Generator (Next.js + Gemini + AWS S3)
+## LogoGenie AI (Next.js + Gemini + AWS S3)
 
 AI-powered logo generator built with Next.js 14, TypeScript, Tailwind, shadcn/ui, Google Gemini, and AWS S3 for logo storage.
 
