@@ -2,14 +2,9 @@ import LogoCard from "./logo-card";
 import { Button } from "@/components/ui/button";
 import { GeneratedLogo } from "@shared/schema";
 import {
-  Check,
-  Info,
-  Download,
-  Image as ImageIcon,
-  FileType,
-  FileText,
-  Lightbulb,
-  Wand2,
+  Sparkles,
+  RefreshCw,
+  ArrowDown,
 } from "lucide-react";
 
 interface LogoGridProps {
@@ -19,112 +14,55 @@ interface LogoGridProps {
 
 const LogoGrid = ({ logos, onGenerateMore }: LogoGridProps) => {
   return (
-    <div className="max-w-6xl mx-auto">
-      <div className="text-center mb-16">
-        <div className="inline-flex items-center justify-center w-16 h-16 bg-gradient-to-br from-primary to-accent rounded-full mb-6">
-          <Check className="h-8 w-8 text-white" />
+    <div className="max-w-6xl mx-auto px-2">
+      {/* Results header */}
+      <div className="text-center mb-8 sm:mb-12">
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-sm text-green-600 dark:text-green-400 font-medium mb-4">
+          <Sparkles className="h-3.5 w-3.5" />
+          {logos.length} Logos Generated
         </div>
-        <h3 className="text-4xl font-bold text-foreground mb-6 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-          Your AI-Generated Logos
+        <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-3 tracking-tight">
+          Your Logo Concepts
         </h3>
-        <p className="text-lg text-muted-foreground mb-8 max-w-2xl mx-auto">
-          ✨ Amazing! We've created{" "}
-          <span className="font-semibold text-foreground">
-            {logos.length} unique designs
-          </span>{" "}
-          for your brand. Choose your favorite and download in any format you
-          need.
+        <p className="text-sm sm:text-base text-muted-foreground mb-6 max-w-lg mx-auto">
+          Each logo is designed in a different style. Click any logo to preview
+          it full-size, then download in your preferred format.
         </p>
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
+        <div className="flex flex-col sm:flex-row gap-3 items-center justify-center">
           <Button
             onClick={onGenerateMore}
             variant="outline"
-            className="px-8 py-3 font-medium border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-200"
+            className="px-6 py-2.5 font-medium border-2 hover:bg-primary hover:text-primary-foreground transition-all duration-200 rounded-xl"
             data-testid="button-generate-more"
           >
-            <Wand2 className="h-4 w-4 mr-2" />
+            <RefreshCw className="h-4 w-4 mr-2" />
             Generate New Variations
           </Button>
-          <div className="text-sm text-muted-foreground flex items-center gap-2">
-            <Info className="h-4 w-4" />
-            <span>All formats work perfectly in Figma</span>
-          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-12">
+      {/* Logo grid */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-16">
         {logos.map((logo) => (
           <LogoCard key={logo.id} logo={logo} />
         ))}
       </div>
 
-      <div className="bg-gradient-to-br from-primary/5 to-accent/5 border border-primary/20 rounded-2xl p-8 text-center relative overflow-hidden">
-        <div className="absolute inset-0 bg-gradient-to-r from-primary/10 via-transparent to-accent/10 opacity-50"></div>
-        <div className="relative z-10">
-          <div className="flex items-center justify-center mb-6">
-            <div className="flex items-center gap-4">
-              <div className="w-12 h-12 bg-gradient-to-br from-primary to-accent rounded-full flex items-center justify-center">
-                <Download className="h-6 w-6 text-white" />
-              </div>
-              <div className="text-left">
-                <h4 className="text-2xl font-bold text-foreground mb-1">
-                  Professional Downloads
-                </h4>
-                <p className="text-muted-foreground">
-                  Export in any format you need
-                </p>
-              </div>
-            </div>
-          </div>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 max-w-3xl mx-auto">
-            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-border hover:border-primary/50 transition-all duration-200 group">
-              <div className="w-10 h-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-                <ImageIcon className="h-5 w-5 text-blue-600" />
-              </div>
-              <h5 className="font-semibold text-foreground mb-2">PNG</h5>
-              <p className="text-sm text-muted-foreground mb-4">
-                High-quality raster format with transparency
-              </p>
-              <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                ✓ Web Ready
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-border hover:border-primary/50 transition-all duration-200 group">
-              <div className="w-10 h-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-                <FileType className="h-5 w-5 text-purple-600" />
-              </div>
-              <h5 className="font-semibold text-foreground mb-2">SVG</h5>
-              <p className="text-sm text-muted-foreground mb-4">
-                Scalable vector format perfect for editing
-              </p>
-              <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                ✓ Figma Compatible
-              </div>
-            </div>
-
-            <div className="bg-white dark:bg-gray-900 rounded-xl p-6 border border-border hover:border-primary/50 transition-all duration-200 group">
-              <div className="w-10 h-10 bg-red-100 dark:bg-red-900 rounded-lg flex items-center justify-center mb-4 mx-auto group-hover:scale-110 transition-transform">
-                <FileText className="h-5 w-5 text-red-600" />
-              </div>
-              <h5 className="font-semibold text-foreground mb-2">PDF</h5>
-              <p className="text-sm text-muted-foreground mb-4">
-                Print-ready document format
-              </p>
-              <div className="text-xs text-green-600 dark:text-green-400 font-medium">
-                ✓ Print Ready
-              </div>
-            </div>
-          </div>
-
-          <div className="mt-8 p-4 bg-primary/10 rounded-xl border border-primary/20">
-            <p className="text-sm text-foreground font-medium flex items-center justify-center gap-2">
-              <Lightbulb className="h-4 w-4 text-primary" />
-              Pro Tip: Use SVG files for the best editing experience in Figma
-              and design tools
-            </p>
-          </div>
+      {/* Download info bar */}
+      <div className="bg-card border border-border rounded-2xl p-5 sm:p-6 text-center">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3 text-sm text-muted-foreground">
+          <ArrowDown className="h-4 w-4 text-primary shrink-0" />
+          <span>
+            <strong className="text-foreground">PNG</strong> for web &amp; social
+          </span>
+          <span className="hidden sm:inline text-border">|</span>
+          <span>
+            <strong className="text-foreground">SVG</strong> for Figma &amp; editing
+          </span>
+          <span className="hidden sm:inline text-border">|</span>
+          <span>
+            <strong className="text-foreground">PDF</strong> for print &amp; documents
+          </span>
         </div>
       </div>
     </div>

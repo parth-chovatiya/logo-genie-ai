@@ -3,7 +3,13 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { GeneratedLogo } from "@shared/schema";
 import jsPDF from "jspdf";
-import { FileImage, FileDigit, FileType, Star } from "lucide-react";
+import {
+  Download,
+  FileImage,
+  FileType,
+  FileText,
+  ZoomIn,
+} from "lucide-react";
 
 interface LogoCardProps {
   logo: GeneratedLogo;
@@ -27,16 +33,12 @@ const LogoCard = ({ logo }: LogoCardProps) => {
         ctx?.drawImage(img, 0, 0);
 
         let downloadData = logo.imageData;
-        let filename = `logo-${logo.style.toLowerCase().replace(/\s+/g, "-")}-${
-          logo.id
-        }`;
+        let filename = `logo-${logo.style.toLowerCase().replace(/\s+/g, "-")}-${logo.id}`;
 
         if (format === "png") {
           downloadData = canvas.toDataURL("image/png");
           filename += ".png";
         } else if (format === "svg") {
-          // Create proper SVG that Figma can edit
-          // Convert image to a proper SVG with vector elements
           const svgData = `<?xml version="1.0" encoding="UTF-8"?>
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="${img.width}" height="${img.height}" viewBox="0 0 ${img.width} ${img.height}">
   <defs>
@@ -47,51 +49,41 @@ const LogoCard = ({ logo }: LogoCardProps) => {
   </defs>
   <rect class="logo-background" width="100%" height="100%"/>
   <image class="logo-image" href="${logo.imageData}" x="0" y="0" width="${img.width}" height="${img.height}" preserveAspectRatio="xMidYMid meet"/>
-  <!-- Figma-editable elements -->
   <g id="logo-group" transform="translate(0,0)">
     <rect id="bounding-box" x="0" y="0" width="${img.width}" height="${img.height}" fill="none" stroke="none" opacity="0"/>
   </g>
 </svg>`;
-          downloadData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(
-            svgData
-          )}`;
+          downloadData = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svgData)}`;
           filename += ".svg";
         } else if (format === "pdf") {
-          // Create proper PDF using jsPDF
           const pdf = new jsPDF({
             orientation: "portrait",
             unit: "mm",
             format: "a4",
           });
 
-          // Calculate dimensions to center logo on A4 page
           const pageWidth = pdf.internal.pageSize.getWidth();
           const pageHeight = pdf.internal.pageSize.getHeight();
-          const maxWidth = pageWidth * 0.6; // 60% of page width
-          const maxHeight = pageHeight * 0.6; // 60% of page height
+          const maxWidth = pageWidth * 0.6;
+          const maxHeight = pageHeight * 0.6;
 
-          // Calculate scale to fit within max dimensions
-          const scaleX = maxWidth / (img.width * 0.264583); // Convert px to mm
+          const scaleX = maxWidth / (img.width * 0.264583);
           const scaleY = maxHeight / (img.height * 0.264583);
           const scale = Math.min(scaleX, scaleY);
 
           const logoWidth = img.width * 0.264583 * scale;
           const logoHeight = img.height * 0.264583 * scale;
 
-          // Center the logo
           const x = (pageWidth - logoWidth) / 2;
           const y = (pageHeight - logoHeight) / 2;
 
-          // Add the logo to PDF
           pdf.addImage(logo.imageData, "PNG", x, y, logoWidth, logoHeight);
 
-          // Save as blob and create download link
           const pdfBlob = pdf.output("blob");
           downloadData = URL.createObjectURL(pdfBlob);
           filename += ".pdf";
         }
 
-        // Create and trigger download
         const link = document.createElement("a");
         link.href = downloadData;
         link.download = filename;
@@ -99,14 +91,11 @@ const LogoCard = ({ logo }: LogoCardProps) => {
         link.click();
         document.body.removeChild(link);
 
-        // Clean up object URL for PDF
         if (format === "pdf") {
           setTimeout(() => URL.revokeObjectURL(downloadData), 1000);
         }
 
-        setTimeout(() => {
-          setIsDownloading(false);
-        }, 1000);
+        setTimeout(() => setIsDownloading(false), 1000);
       };
 
       img.src = logo.imageData;
@@ -116,12 +105,11 @@ const LogoCard = ({ logo }: LogoCardProps) => {
     }
   };
 
-  const handleDownload = () => downloadAsFormat("png");
-
   return (
-    <div className="bg-card border border-border rounded-xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-[1.02] group">
+    <div className="bg-card border border-border rounded-2xl overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 group">
+      {/* Image preview */}
       <div
-        className="aspect-square bg-gradient-to-br from-gray-50 to-gray-100 p-8 flex items-center justify-center relative overflow-hidden cursor-zoom-in"
+        className="aspect-square bg-white p-6 sm:p-8 flex items-center justify-center relative cursor-pointer"
         onClick={() => setIsPreviewOpen(true)}
         role="button"
         aria-label="Open logo preview"
@@ -131,18 +119,23 @@ const LogoCard = ({ logo }: LogoCardProps) => {
           alt={`Generated logo - ${logo.style}`}
           className="max-w-full max-h-full object-contain"
         />
-        <div className="absolute inset-0 bg-black/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+        <div className="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition-colors duration-300 flex items-center justify-center">
+          <div className="opacity-0 group-hover:opacity-100 transition-opacity bg-white/90 dark:bg-black/70 rounded-full p-2.5 shadow-lg">
+            <ZoomIn className="h-5 w-5 text-foreground" />
+          </div>
+        </div>
       </div>
 
-      <div className="p-4 space-y-3">
+      {/* Card footer */}
+      <div className="p-4 space-y-3 border-t border-border">
         <div className="flex items-center justify-between">
-          <span className="text-sm font-medium text-muted-foreground">
-            Style: {logo.style}
+          <span className="text-sm font-semibold text-foreground">
+            {logo.style}
           </span>
-          <div className="flex items-center space-x-1">
-            <Star className="h-3.5 w-3.5 text-yellow-400 fill-yellow-400" />
-            <span className="text-sm text-muted-foreground">{logo.rating}</span>
-          </div>
+          <span className="inline-flex items-center gap-1 text-xs text-muted-foreground bg-secondary px-2 py-0.5 rounded-full">
+            <Download className="h-3 w-3" />
+            3 formats
+          </span>
         </div>
 
         <div className="grid grid-cols-3 gap-2">
@@ -150,10 +143,10 @@ const LogoCard = ({ logo }: LogoCardProps) => {
             onClick={() => downloadAsFormat("png")}
             disabled={isDownloading}
             size="sm"
-            className="py-2 px-3 text-xs font-medium"
+            className="h-9 text-xs font-medium rounded-lg"
             data-testid={`button-download-png-${logo.id}`}
           >
-            <FileImage className="h-4 w-4 mr-1" />
+            <FileImage className="h-3.5 w-3.5 mr-1" />
             PNG
           </Button>
           <Button
@@ -161,10 +154,10 @@ const LogoCard = ({ logo }: LogoCardProps) => {
             disabled={isDownloading}
             size="sm"
             variant="secondary"
-            className="py-2 px-3 text-xs font-medium"
+            className="h-9 text-xs font-medium rounded-lg"
             data-testid={`button-download-svg-${logo.id}`}
           >
-            <FileType className="h-4 w-4 mr-1" />
+            <FileType className="h-3.5 w-3.5 mr-1" />
             SVG
           </Button>
           <Button
@@ -172,22 +165,23 @@ const LogoCard = ({ logo }: LogoCardProps) => {
             disabled={isDownloading}
             size="sm"
             variant="secondary"
-            className="py-2 px-3 text-xs font-medium"
+            className="h-9 text-xs font-medium rounded-lg"
             data-testid={`button-download-pdf-${logo.id}`}
           >
-            <FileDigit className="h-4 w-4 mr-1" />
+            <FileText className="h-3.5 w-3.5 mr-1" />
             PDF
           </Button>
         </div>
       </div>
 
+      {/* Preview dialog */}
       <Dialog open={isPreviewOpen} onOpenChange={setIsPreviewOpen}>
-        <DialogContent className="max-w-[90vw]">
-          <div className="w-full h-full flex items-center justify-center">
+        <DialogContent className="max-w-[95vw] sm:max-w-[85vw] md:max-w-[70vw] lg:max-w-[60vw] p-2 sm:p-4">
+          <div className="w-full flex items-center justify-center bg-white rounded-lg p-4 sm:p-8">
             <img
               src={logo.imageData}
               alt={`Preview - ${logo.style}`}
-              className="max-w-[90vw] max-h-[80vh] object-contain"
+              className="max-w-full max-h-[70vh] sm:max-h-[80vh] object-contain"
             />
           </div>
         </DialogContent>
