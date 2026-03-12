@@ -27,7 +27,7 @@ const rateLimitWindowDescription = (() => {
 export const POST = async (req: NextRequest) => {
   try {
     const ip = getClientIp(req);
-    const rl = getRateLimitState(ip);
+    const rl = await getRateLimitState(ip);
     if (rl.limited) {
       const res = NextResponse.json(
         {

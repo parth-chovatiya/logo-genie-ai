@@ -1,6 +1,11 @@
 import type { NextRequest } from "next/server";
+import { Redis } from "@upstash/redis";
+import { Ratelimit } from "@upstash/ratelimit";
 
-type RateEntry = { count: number; windowStart: number };
+const redis = new Redis({
+  url: process.env.UPSTASH_REDIS_REST_URL!,
+  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+});
 
 export const RATE_LIMIT_WINDOW_MS = (() => {
   const raw = process.env.RATE_LIMIT_WINDOW_MS;
@@ -14,7 +19,13 @@ export const RATE_LIMIT_MAX = (() => {
   return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
 })();
 
-const rateLimiterStore = new Map<string, RateEntry>();
+const windowSeconds = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
+
+const ratelimit = new Ratelimit({
+  redis,
+  limiter: Ratelimit.fixedWindow(RATE_LIMIT_MAX, `${windowSeconds} s`),
+  prefix: "logogenie",
+});
 
 export const getClientIp = (req: NextRequest): string => {
   const xff = req.headers.get("x-forwarded-for");
@@ -24,45 +35,30 @@ export const getClientIp = (req: NextRequest): string => {
   return "unknown";
 };
 
-export const getRateLimitState = (ip: string): {
+export const getRateLimitState = async (
+  ip: string,
+): Promise<{
   limited: boolean;
   retryAfterSeconds: number;
   remaining: number;
   resetAtMs: number;
-} => {
-  const now = Date.now();
-  const entry = rateLimiterStore.get(ip);
+}> => {
+  const { success, remaining, reset } = await ratelimit.limit(ip);
 
-  if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
-    rateLimiterStore.set(ip, { count: 1, windowStart: now });
+  if (success) {
     return {
       limited: false,
       retryAfterSeconds: 0,
-      remaining: Math.max(0, RATE_LIMIT_MAX - 1),
-      resetAtMs: now + RATE_LIMIT_WINDOW_MS,
+      remaining,
+      resetAtMs: reset,
     };
   }
 
-  if (entry.count >= RATE_LIMIT_MAX) {
-    const resetAtMs = entry.windowStart + RATE_LIMIT_WINDOW_MS;
-    const retryAfterSeconds = Math.max(1, Math.ceil((resetAtMs - now) / 1000));
-    return {
-      limited: true,
-      retryAfterSeconds,
-      remaining: 0,
-      resetAtMs,
-    };
-  }
-
-  entry.count += 1;
-  rateLimiterStore.set(ip, entry);
-
-  const resetAtMs = entry.windowStart + RATE_LIMIT_WINDOW_MS;
+  const retryAfterSeconds = Math.max(1, Math.ceil((reset - Date.now()) / 1000));
   return {
-    limited: false,
-    retryAfterSeconds: 0,
-    remaining: Math.max(0, RATE_LIMIT_MAX - entry.count),
-    resetAtMs,
+    limited: true,
+    retryAfterSeconds,
+    remaining: 0,
+    resetAtMs: reset,
   };
 };
-
