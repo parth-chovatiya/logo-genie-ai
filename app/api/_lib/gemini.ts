@@ -13,9 +13,9 @@ export interface LogoGenerationParams {
   colorPreference?: string;
 }
 
-export async function generateLogos(
+export const generateLogos = async (
   params: LogoGenerationParams
-): Promise<GeneratedLogo[]> {
+): Promise<GeneratedLogo[]> => {
   const { brandName, description, businessType, colorPreference } = params;
 
   const styles = [
@@ -97,4 +97,4 @@ The logo should be centered on a square canvas with adequate padding around the 
   }
 
   return logos;
-}
+};

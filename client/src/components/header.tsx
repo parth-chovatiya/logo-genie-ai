@@ -1,6 +1,6 @@
 import { Wand2 } from "lucide-react";
 
-export default function Header() {
+const Header = () => {
   return (
     <header className="border-b border-border bg-card">
       <div className="container mx-auto px-4 py-4 flex items-center justify-center">
@@ -13,4 +13,6 @@ export default function Header() {
       </div>
     </header>
   );
-}
+};
+
+export default Header;

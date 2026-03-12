@@ -6,7 +6,7 @@ interface ErrorStateProps {
   onRetry: () => void;
 }
 
-export default function ErrorState({ message, onRetry }: ErrorStateProps) {
+const ErrorState = ({ message, onRetry }: ErrorStateProps) => {
   return (
     <div className="max-w-2xl mx-auto text-center py-16">
       <div className="space-y-6">
@@ -28,4 +28,6 @@ export default function ErrorState({ message, onRetry }: ErrorStateProps) {
       </div>
     </div>
   );
-}
+};
+
+export default ErrorState;

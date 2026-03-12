@@ -5,7 +5,7 @@ import LogoGrid from "../components/logo-grid";
 import ErrorState from "../components/error-state";
 import { GeneratedLogo } from "@shared/schema";
 
-export default function Home() {
+const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [generatedLogos, setGeneratedLogos] = useState<GeneratedLogo[]>([]);
   const [error, setError] = useState<string>("");
@@ -59,4 +59,6 @@ export default function Home() {
       </main>
     </div>
   );
-}
+};
+
+export default Home;

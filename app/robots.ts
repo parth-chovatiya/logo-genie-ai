@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 const siteUrl =
   process.env.NEXT_PUBLIC_SITE_URL?.replace(/\/$/, "") ?? "http://localhost:3000";
 
-export default function robots(): MetadataRoute.Robots {
+const robots = (): MetadataRoute.Robots => {
   return {
     rules: {
       userAgent: "*",
@@ -12,5 +12,7 @@ export default function robots(): MetadataRoute.Robots {
     },
     sitemap: `${siteUrl}/sitemap.xml`,
   };
-}
+};
+
+export default robots;
 

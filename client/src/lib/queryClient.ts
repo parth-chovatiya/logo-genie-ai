@@ -1,17 +1,17 @@
 import { QueryClient, QueryFunction } from "@tanstack/react-query";
 
-async function throwIfResNotOk(res: Response) {
+const throwIfResNotOk = async (res: Response) => {
   if (!res.ok) {
     const text = (await res.text()) || res.statusText;
     throw new Error(`${res.status}: ${text}`);
   }
 }
 
-export async function apiRequest(
+export const apiRequest = async (
   method: string,
   url: string,
   data?: unknown | undefined,
-): Promise<Response> {
+): Promise<Response> => {
   const res = await fetch(url, {
     method,
     headers: data ? { "Content-Type": "application/json" } : {},

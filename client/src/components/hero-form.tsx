@@ -34,11 +34,11 @@ interface HeroFormProps {
   onError: (error: string) => void;
 }
 
-export default function HeroForm({
+const HeroForm = ({
   onGenerate,
   onLoading,
   onError,
-}: HeroFormProps) {
+}: HeroFormProps) => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -208,4 +208,6 @@ export default function HeroForm({
       </Form>
     </div>
   );
-}
+};
+
+export default HeroForm;

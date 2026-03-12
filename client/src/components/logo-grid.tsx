@@ -17,7 +17,7 @@ interface LogoGridProps {
   onGenerateMore: () => void;
 }
 
-export default function LogoGrid({ logos, onGenerateMore }: LogoGridProps) {
+const LogoGrid = ({ logos, onGenerateMore }: LogoGridProps) => {
   return (
     <div className="max-w-6xl mx-auto">
       <div className="text-center mb-16">
@@ -129,4 +129,6 @@ export default function LogoGrid({ logos, onGenerateMore }: LogoGridProps) {
       </div>
     </div>
   );
-}
+};
+
+export default LogoGrid;

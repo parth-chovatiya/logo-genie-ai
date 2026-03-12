@@ -9,7 +9,7 @@ interface LogoCardProps {
   logo: GeneratedLogo;
 }
 
-export default function LogoCard({ logo }: LogoCardProps) {
+const LogoCard = ({ logo }: LogoCardProps) => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
@@ -194,4 +194,6 @@ export default function LogoCard({ logo }: LogoCardProps) {
       </Dialog>
     </div>
   );
-}
+};
+
+export default LogoCard;

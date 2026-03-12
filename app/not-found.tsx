@@ -1,5 +1,7 @@
 import NotFound from "@/pages/not-found";
 
-export default function NotFoundPage() {
+const NotFoundPage = () => {
   return <NotFound />;
-}
+};
+
+export default NotFoundPage;

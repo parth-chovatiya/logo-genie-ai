@@ -1,7 +1,7 @@
 import { Skeleton } from "@/components/ui/skeleton";
 import { Wand2 } from "lucide-react";
 
-export default function LoadingState() {
+const LoadingState = () => {
   return (
     <div className="max-w-6xl mx-auto py-12">
       <div className="max-w-2xl mx-auto text-center space-y-6">
@@ -48,4 +48,6 @@ export default function LoadingState() {
       </div>
     </div>
   );
-}
+};
+
+export default LoadingState;

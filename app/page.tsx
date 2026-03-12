@@ -2,7 +2,7 @@
 
 import Home from "@/pages/home";
 
-export default function Page() {
+const Page = () => {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "WebApplication",
@@ -29,4 +29,6 @@ export default function Page() {
       <Home />
     </>
   );
-}
+};
+
+export default Page;
