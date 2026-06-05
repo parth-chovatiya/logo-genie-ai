@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import Providers from "./providers";
 import "./globals.css";
 import { MessageCircle } from "lucide-react";
@@ -16,6 +16,15 @@ export const metadata: Metadata = {
   description:
     "Generate unique, high-quality logos in seconds with AI. Pick a style, tweak your brand details, and download instantly.",
   applicationName: "LogoGenie AI",
+  authors: [{ name: "LogoGenie AI" }],
+  creator: "LogoGenie AI",
+  publisher: "LogoGenie AI",
+  category: "technology",
+  formatDetection: {
+    email: false,
+    address: false,
+    telephone: false,
+  },
   keywords: [
     "AI logo generator",
     "logo generator",
@@ -23,6 +32,9 @@ export const metadata: Metadata = {
     "brand identity",
     "startup branding",
     "logo design",
+    "free logo maker",
+    "logo maker",
+    "SVG logo",
   ],
   alternates: {
     canonical: "/",
@@ -30,14 +42,15 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     url: "/",
-    title: "LogoGenie AI",
+    title: "LogoGenie AI — Generate unique logos in seconds with AI",
     description:
       "Generate unique, high-quality logos in seconds with AI. Pick a style, tweak your brand details, and download instantly.",
     siteName: "LogoGenie AI",
+    locale: "en_US",
   },
   twitter: {
     card: "summary_large_image",
-    title: "LogoGenie AI",
+    title: "LogoGenie AI — Generate unique logos in seconds with AI",
     description:
       "Generate unique, high-quality logos in seconds with AI. Pick a style, tweak your brand details, and download instantly.",
   },
@@ -52,6 +65,16 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#0B1120" },
+  ],
+  colorScheme: "light dark",
+  width: "device-width",
+  initialScale: 1,
 };
 
 const RootLayout = ({
