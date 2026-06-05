@@ -13,6 +13,7 @@ import {
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(false);
+  const [loadingCount, setLoadingCount] = useState(4);
   const [generatedLogos, setGeneratedLogos] = useState<GeneratedLogo[]>([]);
   const [request, setRequest] = useState<LogoGenerationRequest | null>(null);
   const [error, setError] = useState<string>("");
@@ -20,6 +21,11 @@ const Home = () => {
   const [showHistory, setShowHistory] = useState(false);
 
   const { history, addEntry, removeEntry, clearHistory } = useLogoHistory();
+
+  const handleLoading = (loading: boolean, count?: number) => {
+    if (loading && count) setLoadingCount(count);
+    setIsLoading(loading);
+  };
 
   const handleGenerateLogos = (
     logos: GeneratedLogo[],
@@ -89,12 +95,12 @@ const Home = () => {
         {!showHistory && showForm && (
           <HeroForm
             onGenerate={handleGenerateLogos}
-            onLoading={setIsLoading}
+            onLoading={handleLoading}
             onError={handleError}
           />
         )}
 
-        {!showHistory && isLoading && <LoadingState />}
+        {!showHistory && isLoading && <LoadingState count={loadingCount} />}
 
         {!showHistory && showResults && generatedLogos.length > 0 && (
           <LogoGrid

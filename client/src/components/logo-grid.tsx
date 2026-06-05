@@ -21,7 +21,7 @@ const LogoGrid = ({
   onReplaceLogo,
 }: LogoGridProps) => {
   return (
-    <div className="max-w-6xl mx-auto px-2">
+    <div className="max-w-6xl mx-auto px-2 animate-fade-in">
       {/* Results header */}
       <div className="text-center mb-8 sm:mb-12">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-green-500/10 border border-green-500/20 rounded-full text-sm text-green-600 dark:text-green-400 font-medium mb-4">
@@ -49,14 +49,23 @@ const LogoGrid = ({
       </div>
 
       {/* Logo grid */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-16">
-        {logos.map((logo) => (
-          <LogoCard
+      <div
+        className={`grid grid-cols-1 sm:grid-cols-2 ${
+          logos.length >= 3 ? "lg:grid-cols-4" : "lg:grid-cols-2 max-w-3xl mx-auto"
+        } gap-4 sm:gap-6 mb-10 sm:mb-16`}
+      >
+        {logos.map((logo, index) => (
+          <div
             key={logo.id}
-            logo={logo}
-            request={request}
-            onReplaceLogo={onReplaceLogo}
-          />
+            className="animate-fade-in-up"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <LogoCard
+              logo={logo}
+              request={request}
+              onReplaceLogo={onReplaceLogo}
+            />
+          </div>
         ))}
       </div>
 

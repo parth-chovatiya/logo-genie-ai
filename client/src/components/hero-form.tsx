@@ -39,7 +39,7 @@ import {
 
 interface HeroFormProps {
   onGenerate: (logos: GeneratedLogo[], request: LogoGenerationRequest) => void;
-  onLoading: (loading: boolean) => void;
+  onLoading: (loading: boolean, count?: number) => void;
   onError: (error: string) => void;
 }
 
@@ -89,7 +89,7 @@ const HeroForm = ({ onGenerate, onLoading, onError }: HeroFormProps) => {
   const onSubmit = async (data: LogoGenerationRequest) => {
     try {
       setIsSubmitting(true);
-      onLoading(true);
+      onLoading(true, data.styles?.length ?? LOGO_STYLE_NAMES.length);
 
       const response = await apiRequest("POST", "/api/generate", data);
       const result = await response.json();
@@ -125,7 +125,7 @@ const HeroForm = ({ onGenerate, onLoading, onError }: HeroFormProps) => {
   };
 
   return (
-    <div className="max-w-3xl mx-auto px-2">
+    <div className="max-w-3xl mx-auto px-2 animate-fade-in">
       {/* Hero text */}
       <div className="text-center mb-8 sm:mb-12">
         <div className="inline-flex items-center gap-2 px-4 py-1.5 bg-primary/10 border border-primary/20 rounded-full text-sm text-primary font-medium mb-6">

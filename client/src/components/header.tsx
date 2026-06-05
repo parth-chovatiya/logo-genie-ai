@@ -1,4 +1,5 @@
 import { Sparkles, History } from "lucide-react";
+import ThemeToggle from "./theme-toggle";
 
 interface HeaderProps {
   onToggleHistory?: () => void;
@@ -31,7 +32,7 @@ const Header = ({ onToggleHistory, historyCount = 0 }: HeaderProps) => {
               onClick={onToggleHistory}
               aria-label="Toggle generation history"
               data-testid="button-toggle-history"
-              className="relative inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+              className="relative inline-flex items-center gap-1.5 h-9 px-2.5 sm:px-3 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
             >
               <History className="h-4 w-4" />
               <span className="hidden sm:inline">History</span>
@@ -42,6 +43,7 @@ const Header = ({ onToggleHistory, historyCount = 0 }: HeaderProps) => {
               )}
             </button>
           )}
+          <ThemeToggle />
         </div>
       </div>
     </header>

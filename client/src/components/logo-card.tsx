@@ -248,61 +248,68 @@ const LogoCard = ({ logo, request, onReplaceLogo }: LogoCardProps) => {
           )}
         </div>
 
-        <div className="grid grid-cols-3 gap-2">
-          <Button
-            onClick={() => downloadPng(false)}
-            disabled={busy}
-            size="sm"
-            className="h-9 text-xs font-medium rounded-lg"
-            data-testid={`button-download-png-${logo.id}`}
-          >
-            <FileImage className="h-3.5 w-3.5 mr-1" />
-            PNG
-          </Button>
-          <Button
-            onClick={() => downloadSvg()}
-            disabled={busy}
-            size="sm"
-            variant="secondary"
-            className="h-9 text-xs font-medium rounded-lg"
-            data-testid={`button-download-svg-${logo.id}`}
-          >
-            <FileType className="h-3.5 w-3.5 mr-1" />
-            SVG
-          </Button>
-          <Button
-            onClick={() => downloadPdf()}
-            disabled={busy}
-            size="sm"
-            variant="secondary"
-            className="h-9 text-xs font-medium rounded-lg"
-            data-testid={`button-download-pdf-${logo.id}`}
-          >
-            <FileText className="h-3.5 w-3.5 mr-1" />
-            PDF
-          </Button>
-          <Button
-            onClick={() => downloadPng(true)}
-            disabled={busy}
-            size="sm"
-            variant="secondary"
-            className="h-9 text-xs font-medium rounded-lg"
-            data-testid={`button-download-transparent-${logo.id}`}
-          >
-            <Eraser className="h-3.5 w-3.5 mr-1" />
-            Transparent
-          </Button>
-          <Button
-            onClick={() => downloadFaviconPack()}
-            disabled={busy}
-            size="sm"
-            variant="secondary"
-            className="h-9 text-xs font-medium rounded-lg col-span-2"
-            data-testid={`button-download-favicons-${logo.id}`}
-          >
-            <Layers className="h-3.5 w-3.5 mr-1" />
-            Favicon pack
-          </Button>
+        <div className="space-y-2">
+          <p className="text-[11px] font-medium uppercase tracking-wide text-muted-foreground">
+            Download
+          </p>
+          <div className="grid grid-cols-3 gap-2">
+            <Button
+              onClick={() => downloadPng(false)}
+              disabled={busy}
+              size="sm"
+              className="h-9 px-2 text-xs font-medium rounded-lg min-w-0"
+              data-testid={`button-download-png-${logo.id}`}
+            >
+              <FileImage className="h-3.5 w-3.5 mr-1 shrink-0" />
+              <span className="truncate">PNG</span>
+            </Button>
+            <Button
+              onClick={() => downloadSvg()}
+              disabled={busy}
+              size="sm"
+              variant="secondary"
+              className="h-9 px-2 text-xs font-medium rounded-lg min-w-0"
+              data-testid={`button-download-svg-${logo.id}`}
+            >
+              <FileType className="h-3.5 w-3.5 mr-1 shrink-0" />
+              <span className="truncate">SVG</span>
+            </Button>
+            <Button
+              onClick={() => downloadPdf()}
+              disabled={busy}
+              size="sm"
+              variant="secondary"
+              className="h-9 px-2 text-xs font-medium rounded-lg min-w-0"
+              data-testid={`button-download-pdf-${logo.id}`}
+            >
+              <FileText className="h-3.5 w-3.5 mr-1 shrink-0" />
+              <span className="truncate">PDF</span>
+            </Button>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <Button
+              onClick={() => downloadPng(true)}
+              disabled={busy}
+              size="sm"
+              variant="outline"
+              className="h-9 px-2 text-xs font-medium rounded-lg min-w-0"
+              data-testid={`button-download-transparent-${logo.id}`}
+            >
+              <Eraser className="h-3.5 w-3.5 mr-1 shrink-0" />
+              <span className="truncate">Transparent</span>
+            </Button>
+            <Button
+              onClick={() => downloadFaviconPack()}
+              disabled={busy}
+              size="sm"
+              variant="outline"
+              className="h-9 px-2 text-xs font-medium rounded-lg min-w-0"
+              data-testid={`button-download-favicons-${logo.id}`}
+            >
+              <Layers className="h-3.5 w-3.5 mr-1 shrink-0" />
+              <span className="truncate">Favicons</span>
+            </Button>
+          </div>
         </div>
       </div>
 
