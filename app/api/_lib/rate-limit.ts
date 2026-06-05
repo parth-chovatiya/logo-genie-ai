@@ -2,30 +2,35 @@ import type { NextRequest } from "next/server";
 import { Redis } from "@upstash/redis";
 import { Ratelimit } from "@upstash/ratelimit";
 
-const redis = new Redis({
-  url: process.env.UPSTASH_REDIS_REST_URL!,
-  token: process.env.UPSTASH_REDIS_REST_TOKEN!,
-});
-
 export const RATE_LIMIT_WINDOW_MS = (() => {
   const raw = process.env.RATE_LIMIT_WINDOW_MS;
   const parsed = raw ? parseInt(raw, 10) : NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 6 * 60 * 60 * 1000;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 60 * 60 * 1000;
 })();
 
 export const RATE_LIMIT_MAX = (() => {
   const raw = process.env.RATE_LIMIT_MAX;
   const parsed = raw ? parseInt(raw, 10) : NaN;
-  return Number.isFinite(parsed) && parsed > 0 ? parsed : 1;
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : 5;
 })();
 
 const windowSeconds = Math.ceil(RATE_LIMIT_WINDOW_MS / 1000);
 
-const ratelimit = new Ratelimit({
-  redis,
-  limiter: Ratelimit.fixedWindow(RATE_LIMIT_MAX, `${windowSeconds} s`),
-  prefix: "logogenie",
-});
+const ratelimit = (() => {
+  const url = process.env.UPSTASH_REDIS_REST_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN;
+  if (!url || !token) {
+    console.warn(
+      "Upstash Redis env vars not set — rate limiting is disabled.",
+    );
+    return null;
+  }
+  return new Ratelimit({
+    redis: new Redis({ url, token }),
+    limiter: Ratelimit.fixedWindow(RATE_LIMIT_MAX, `${windowSeconds} s`),
+    prefix: "logogenie",
+  });
+})();
 
 export const getClientIp = (req: NextRequest): string => {
   const xff = req.headers.get("x-forwarded-for");
@@ -43,7 +48,19 @@ export const getRateLimitState = async (
   remaining: number;
   resetAtMs: number;
 }> => {
-  const { success, remaining, reset } = await ratelimit.limit(ip);
+  if (!ratelimit) {
+    return { limited: false, retryAfterSeconds: 0, remaining: RATE_LIMIT_MAX, resetAtMs: Date.now() };
+  }
+
+  let success: boolean;
+  let remaining: number;
+  let reset: number;
+  try {
+    ({ success, remaining, reset } = await ratelimit.limit(ip));
+  } catch (error) {
+    console.error("Rate limit check failed; allowing request:", error);
+    return { limited: false, retryAfterSeconds: 0, remaining: RATE_LIMIT_MAX, resetAtMs: Date.now() };
+  }
 
   if (success) {
     return {

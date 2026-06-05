@@ -1,6 +1,6 @@
 import LogoCard from "./logo-card";
 import { Button } from "@/components/ui/button";
-import { GeneratedLogo } from "@shared/schema";
+import { GeneratedLogo, LogoGenerationRequest } from "@shared/schema";
 import {
   Sparkles,
   RefreshCw,
@@ -9,10 +9,17 @@ import {
 
 interface LogoGridProps {
   logos: GeneratedLogo[];
+  request: LogoGenerationRequest | null;
   onGenerateMore: () => void;
+  onReplaceLogo: (oldId: string, updated: GeneratedLogo) => void;
 }
 
-const LogoGrid = ({ logos, onGenerateMore }: LogoGridProps) => {
+const LogoGrid = ({
+  logos,
+  request,
+  onGenerateMore,
+  onReplaceLogo,
+}: LogoGridProps) => {
   return (
     <div className="max-w-6xl mx-auto px-2">
       {/* Results header */}
@@ -44,7 +51,12 @@ const LogoGrid = ({ logos, onGenerateMore }: LogoGridProps) => {
       {/* Logo grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-10 sm:mb-16">
         {logos.map((logo) => (
-          <LogoCard key={logo.id} logo={logo} />
+          <LogoCard
+            key={logo.id}
+            logo={logo}
+            request={request}
+            onReplaceLogo={onReplaceLogo}
+          />
         ))}
       </div>
 

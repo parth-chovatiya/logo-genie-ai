@@ -28,11 +28,25 @@ export const insertLogoRequestSchema = createInsertSchema(logoRequests).omit({
   generatedLogos: true,
 });
 
+export const LOGO_STYLE_NAMES = [
+  "Modern Minimal",
+  "Bold Wordmark",
+  "Icon & Text",
+  "Emblem Badge",
+] as const;
+
+export type LogoStyleName = (typeof LOGO_STYLE_NAMES)[number];
+
 export const logoGenerationRequestSchema = z.object({
   brandName: z.string().min(1, "Brand name is required"),
   description: z.string().min(1, "Description is required"),
   businessType: z.string().min(1, "Business type is required"),
   colorPreference: z.string().optional(),
+  styles: z
+    .array(z.enum(LOGO_STYLE_NAMES))
+    .min(1, "Select at least one style")
+    .max(LOGO_STYLE_NAMES.length)
+    .optional(),
 });
 
 export type InsertLogoRequest = z.infer<typeof insertLogoRequestSchema>;

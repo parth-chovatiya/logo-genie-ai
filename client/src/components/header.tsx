@@ -1,6 +1,11 @@
-import { Sparkles } from "lucide-react";
+import { Sparkles, History } from "lucide-react";
 
-const Header = () => {
+interface HeaderProps {
+  onToggleHistory?: () => void;
+  historyCount?: number;
+}
+
+const Header = ({ onToggleHistory, historyCount = 0 }: HeaderProps) => {
   return (
     <header className="sticky top-0 z-50 border-b border-border/50 bg-background/80 backdrop-blur-xl">
       <div className="container mx-auto px-4 py-3 sm:py-4 flex items-center justify-between">
@@ -15,9 +20,28 @@ const Header = () => {
             </h1>
           </div>
         </a>
-        <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
-          <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
-          Powered by Gemini
+        <div className="flex items-center gap-3">
+          <div className="hidden sm:flex items-center gap-2 text-xs text-muted-foreground">
+            <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            Powered by Gemini
+          </div>
+          {onToggleHistory && (
+            <button
+              type="button"
+              onClick={onToggleHistory}
+              aria-label="Toggle generation history"
+              data-testid="button-toggle-history"
+              className="relative inline-flex items-center gap-1.5 h-9 px-3 rounded-lg border border-border text-sm font-medium text-muted-foreground hover:text-foreground hover:border-primary/40 transition-colors"
+            >
+              <History className="h-4 w-4" />
+              <span className="hidden sm:inline">History</span>
+              {historyCount > 0 && (
+                <span className="ml-0.5 inline-flex items-center justify-center min-w-[18px] h-[18px] px-1 rounded-full bg-primary text-primary-foreground text-[10px] font-bold">
+                  {historyCount}
+                </span>
+              )}
+            </button>
+          )}
         </div>
       </div>
     </header>

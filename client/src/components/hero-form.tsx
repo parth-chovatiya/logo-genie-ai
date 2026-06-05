@@ -3,6 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {
   logoGenerationRequestSchema,
+  LOGO_STYLE_NAMES,
   type LogoGenerationRequest,
   type GeneratedLogo,
 } from "@shared/schema";
@@ -32,10 +33,12 @@ import {
   Palette,
   Type,
   FileText,
+  Shapes,
+  Check,
 } from "lucide-react";
 
 interface HeroFormProps {
-  onGenerate: (logos: GeneratedLogo[]) => void;
+  onGenerate: (logos: GeneratedLogo[], request: LogoGenerationRequest) => void;
   onLoading: (loading: boolean) => void;
   onError: (error: string) => void;
 }
@@ -69,8 +72,19 @@ const HeroForm = ({ onGenerate, onLoading, onError }: HeroFormProps) => {
       description: "",
       businessType: "",
       colorPreference: "",
+      styles: [...LOGO_STYLE_NAMES],
     },
   });
+
+  const selectedStyles = form.watch("styles") ?? [...LOGO_STYLE_NAMES];
+
+  const toggleStyle = (style: (typeof LOGO_STYLE_NAMES)[number]) => {
+    const current = form.getValues("styles") ?? [...LOGO_STYLE_NAMES];
+    const next = current.includes(style)
+      ? current.filter((s) => s !== style)
+      : [...current, style];
+    form.setValue("styles", next, { shouldValidate: true });
+  };
 
   const onSubmit = async (data: LogoGenerationRequest) => {
     try {
@@ -80,7 +94,13 @@ const HeroForm = ({ onGenerate, onLoading, onError }: HeroFormProps) => {
       const response = await apiRequest("POST", "/api/generate", data);
       const result = await response.json();
 
-      onGenerate(result.logos);
+      if (!Array.isArray(result?.logos) || result.logos.length === 0) {
+        throw new Error(
+          result?.message || "Unexpected response from the server. Please try again.",
+        );
+      }
+
+      onGenerate(result.logos, data);
 
       toast({
         title: "Logos Generated Successfully!",
@@ -235,10 +255,50 @@ const HeroForm = ({ onGenerate, onLoading, onError }: HeroFormProps) => {
             )}
           />
 
+          {/* Style selection */}
+          <FormField
+            control={form.control}
+            name="styles"
+            render={() => (
+              <FormItem>
+                <FormLabel className="flex items-center gap-1.5 text-sm font-medium">
+                  <Shapes className="h-3.5 w-3.5 text-muted-foreground" />
+                  Logo Styles
+                  <span className="text-muted-foreground font-normal">
+                    ({selectedStyles.length} selected)
+                  </span>
+                </FormLabel>
+                <div className="grid grid-cols-2 gap-2">
+                  {LOGO_STYLE_NAMES.map((style) => {
+                    const active = selectedStyles.includes(style);
+                    return (
+                      <button
+                        type="button"
+                        key={style}
+                        onClick={() => toggleStyle(style)}
+                        aria-pressed={active}
+                        data-testid={`style-toggle-${style}`}
+                        className={`flex items-center justify-between gap-2 h-11 px-3 rounded-lg border text-sm font-medium transition-colors ${
+                          active
+                            ? "border-primary bg-primary/10 text-primary"
+                            : "border-border bg-background text-muted-foreground hover:border-primary/40"
+                        }`}
+                      >
+                        <span>{style}</span>
+                        {active && <Check className="h-4 w-4 shrink-0" />}
+                      </button>
+                    );
+                  })}
+                </div>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
           {/* Submit */}
           <Button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || selectedStyles.length === 0}
             className="w-full h-12 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-primary-foreground rounded-xl font-semibold text-base transition-all duration-200 hover:shadow-lg hover:shadow-primary/25"
             data-testid="button-generate"
           >

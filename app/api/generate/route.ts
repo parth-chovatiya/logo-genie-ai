@@ -9,6 +9,16 @@ import {
   RATE_LIMIT_WINDOW_MS,
 } from "../_lib/rate-limit";
 
+export const runtime = "nodejs";
+export const maxDuration = 60;
+
+const extensionForDataUrl = (dataUrl: string): string => {
+  const mime = dataUrl.match(/^data:(.*?);base64,/)?.[1] ?? "";
+  if (mime.includes("jpeg") || mime.includes("jpg")) return "jpg";
+  if (mime.includes("webp")) return "webp";
+  return "png";
+};
+
 const rateLimitWindowDescription = (() => {
   const hours = RATE_LIMIT_WINDOW_MS / (60 * 60 * 1000);
   if (Number.isInteger(hours) && hours >= 1) {
@@ -65,7 +75,7 @@ export const POST = async (req: NextRequest) => {
           logos.map((logo) =>
             uploadLogoDataUrl({
               dataUrl: logo.imageData,
-              key: `requests/${Date.now()}-${logo.id}.png`,
+              key: `requests/${Date.now()}-${logo.id}.${extensionForDataUrl(logo.imageData)}`,
               metadata: {
                 style: logo.style,
                 rating: String(logo.rating),

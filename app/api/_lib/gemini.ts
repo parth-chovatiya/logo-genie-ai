@@ -1,16 +1,31 @@
 import { GoogleGenAI, Modality } from "@google/genai";
 import { randomUUID } from "crypto";
-import { GeneratedLogo } from "@shared/schema";
+import { GeneratedLogo, LogoStyleName } from "@shared/schema";
 
-const ai = new GoogleGenAI({
-  apiKey: process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY || "",
-});
+const getApiKey = (): string => {
+  const key = process.env.GEMINI_API_KEY || process.env.GOOGLE_AI_API_KEY;
+  if (!key) {
+    throw new Error(
+      "GEMINI_API_KEY is not configured. Set GEMINI_API_KEY (or GOOGLE_AI_API_KEY) in your environment.",
+    );
+  }
+  return key;
+};
+
+let cachedClient: GoogleGenAI | null = null;
+const getClient = (): GoogleGenAI => {
+  if (!cachedClient) {
+    cachedClient = new GoogleGenAI({ apiKey: getApiKey() });
+  }
+  return cachedClient;
+};
 
 export interface LogoGenerationParams {
   brandName: string;
   description: string;
   businessType: string;
   colorPreference?: string;
+  styles?: LogoStyleName[];
 }
 
 const LOGO_STYLES = [
@@ -36,19 +51,18 @@ const LOGO_STYLES = [
   },
 ];
 
-export const generateLogos = async (
+type LogoStyle = (typeof LOGO_STYLES)[number];
+
+const buildPrompt = (
+  style: LogoStyle,
   params: LogoGenerationParams,
-): Promise<GeneratedLogo[]> => {
+): string => {
   const { brandName, description, businessType, colorPreference } = params;
+  const colorInstruction = colorPreference
+    ? `Color palette: Use ${colorPreference} as the primary colors.`
+    : `Color palette: Choose a sophisticated, modern color palette appropriate for a ${businessType} brand. Limit to 2-3 colors maximum for versatility.`;
 
-  const logos: GeneratedLogo[] = [];
-
-  for (const style of LOGO_STYLES) {
-    const colorInstruction = colorPreference
-      ? `Color palette: Use ${colorPreference} as the primary colors.`
-      : `Color palette: Choose a sophisticated, modern color palette appropriate for a ${businessType} brand. Limit to 2-3 colors maximum for versatility.`;
-
-    const prompt = `You are a world-class logo designer. Design a professional logo for the following brand:
+  return `You are a world-class logo designer. Design a professional logo for the following brand:
 
 Brand Name: "${brandName}"
 Industry: ${businessType}
@@ -67,48 +81,59 @@ Critical Requirements:
 - No stock-art feel — this should look custom and premium
 - Center the entire composition with generous padding around all edges
 - Square canvas, 1:1 aspect ratio`;
+};
 
-    try {
-      const response = await ai.models.generateContent({
-        model: "gemini-3.1-flash-image-preview",
-        contents: [{ role: "user", parts: [{ text: prompt }] }],
-        config: {
-          responseModalities: [Modality.TEXT, Modality.IMAGE],
-        },
-      });
+const generateSingleLogo = async (
+  style: LogoStyle,
+  params: LogoGenerationParams,
+): Promise<GeneratedLogo | null> => {
+  try {
+    const response = await getClient().models.generateContent({
+      model: "gemini-3.1-flash-image-preview",
+      contents: [{ role: "user", parts: [{ text: buildPrompt(style, params) }] }],
+      config: {
+        responseModalities: [Modality.TEXT, Modality.IMAGE],
+      },
+    });
 
-      const candidates = response.candidates;
-      if (candidates && candidates.length > 0) {
-        const content = candidates[0].content;
-        if (content && content.parts) {
-          for (const part of content.parts) {
-            if ((part as any).inlineData && (part as any).inlineData.data) {
-              const inlineData = (part as any).inlineData as {
-                data: string;
-                mimeType: string;
-              };
-              const logoId = randomUUID();
-              const imageData = `data:${inlineData.mimeType};base64,${inlineData.data}`;
-
-              logos.push({
-                id: logoId,
-                imageData,
-                style: style.name,
-                rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
-              });
-              break;
-            }
-          }
-        }
+    const parts = response.candidates?.[0]?.content?.parts ?? [];
+    for (const part of parts) {
+      const inlineData = (part as any).inlineData as
+        | { data: string; mimeType: string }
+        | undefined;
+      if (inlineData?.data) {
+        return {
+          id: randomUUID(),
+          imageData: `data:${inlineData.mimeType};base64,${inlineData.data}`,
+          style: style.name,
+          rating: Math.round((Math.random() * 1 + 4) * 10) / 10,
+        };
       }
-    } catch (error) {
-      console.error(`Failed to generate logo with style ${style.name}:`, error);
     }
+    return null;
+  } catch (error) {
+    console.error(`Failed to generate logo with style ${style.name}:`, error);
+    return null;
   }
+};
+
+export const generateLogos = async (
+  params: LogoGenerationParams,
+): Promise<GeneratedLogo[]> => {
+  const requested = params.styles;
+  const styles =
+    requested && requested.length > 0
+      ? LOGO_STYLES.filter((s) => requested.includes(s.name as LogoStyleName))
+      : LOGO_STYLES;
+
+  const results = await Promise.all(
+    styles.map((style) => generateSingleLogo(style, params)),
+  );
+  const logos = results.filter((logo): logo is GeneratedLogo => logo !== null);
 
   if (logos.length === 0) {
     throw new Error(
-      "Failed to generate any logos. Please check your API key and try again.",
+      "Failed to generate any logos. Please try again in a moment.",
     );
   }
 
